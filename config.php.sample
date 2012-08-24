@@ -1,0 +1,50 @@
+<?php
+
+// Edit configuration below
+
+$username = 'Put your github username here';
+$password = 'Put your github password here';
+$project = 'Organization or User name';
+$repo = 'Repository name';
+
+// All users must be valid github logins!
+$users_list = array(
+	'TracUsermame' => 'GithubUsername',
+	'Trustmaster' => 'trustmaster',
+	'John.Done' => 'johndoe'
+);
+
+$mysqlhost_trac = 'Trac MySQL host';
+$mysqluser_trac = 'Trac MySQL user';
+$mysqlpassword_trac = 'Trac MySQL password';
+$mysqldb_trac = 'Trac MySQL database name';
+
+// Do not convert milestones at this run
+$skip_milestones = false;
+
+// Do not convert labels at this run
+$skip_labels = false;
+
+// Do not convert tickets
+$skip_tickets = false;
+$ticket_offset = 0; // Start at this offset if limit > 0
+$ticket_limit = 0; // Max tickets per run if > 0
+
+// Do not convert comments
+$skip_comments = true;
+$comments_offset = 0; // Start at this offset if limit > 0
+$comments_limit = 0; // Max comments per run if > 0
+
+// Paths to milestone/ticket cache if you run it multiple times with skip/offset
+$save_milestones = '/tmp/trac_milestones.list';
+$save_tickets = '/tmp/trac_tickets.list';
+
+// Set this to true if you want to see the JSON output sent to GitHub
+$verbose = false;
+
+// Uncomment to refresh cache
+// @unlink($save_milestones);
+// @unlink($save_labels);
+// @unlink($save_tickets);
+
+?>
