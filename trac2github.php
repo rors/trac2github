@@ -114,9 +114,10 @@ if (!$skip_tickets) {
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
 	$res = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
 	foreach ($res->fetchAll() as $row) {
-		if (empty($row['milestone'])) {
-			continue;
-		}
+		// do not esclude ticket without milestone
+		// if (empty($row['milestone'])) {
+		// 	continue;
+		// }
 		if (empty($row['owner']) || !isset($users_list[$row['owner']])) {
 			$row['owner'] = $username;
 		}
@@ -135,13 +136,19 @@ if (!$skip_tickets) {
 		}
 
         // There is a strange issue with summaries containing percent signs...
-		$resp = github_add_issue(array(
+        $issueData = array(
 			'title' => preg_replace("/%/", '[pct]', $row['summary']),
 			'body' => empty($row['description']) ? 'None' : translate_markup($row['description']),
 			'assignee' => isset($users_list[$row['owner']]) ? $users_list[$row['owner']] : $row['owner'],
-			'milestone' => $milestones[crc32($row['milestone'])],
 			'labels' => $ticketLabels
-		));
+		);
+		// set milestone only if ticket is assigned to it
+		if (!empty($row['milestone'])) {
+			$issueData['milestone'] = $milestones[crc32($row['milestone'])];
+		}
+		
+		$resp = github_add_issue($issueData);
+
 		if (isset($resp['number'])) {
 			// OK
 			$tickets[$row['id']] = (int) $resp['number'];
