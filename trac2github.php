@@ -137,8 +137,8 @@ if (!$skip_tickets) {
 
         // There is a strange issue with summaries containing percent signs...
         $issueData = array(
-			'title' => preg_replace("/%/", '[pct]', $row['summary']),
-			'body' => empty($row['description']) ? 'None' : translate_markup($row['description']),
+			'title' => utf8_encode(preg_replace("/%/", '[pct]', $row['summary'])),
+			'body' => empty($row['description']) ? 'None' : translate_markup(utf8_encode($row['description'])),
 			'assignee' => isset($users_list[$row['owner']]) ? $users_list[$row['owner']] : $row['owner'],
 			'labels' => $ticketLabels
 		);
@@ -146,7 +146,7 @@ if (!$skip_tickets) {
 		if (!empty($row['milestone'])) {
 			$issueData['milestone'] = $milestones[crc32($row['milestone'])];
 		}
-		
+
 		$resp = github_add_issue($issueData);
 
 		if (isset($resp['number'])) {
@@ -155,14 +155,8 @@ if (!$skip_tickets) {
 			echo "Ticket #{$row['id']} converted to issue #{$resp['number']}\n";
 			if ($row['status'] == 'closed') {
 				// Close the issue
-				$resp = github_update_issue($resp['number'], array(
-					'title' => preg_replace("/%/", '[pct]', $row['summary']),
-					'body' => empty($row['description']) ? 'None' : translate_markup($row['description']),
-					'assignee' => isset($users_list[$row['owner']]) ? $users_list[$row['owner']] : $row['owner'],
-					'milestone' => $milestones[crc32($row['milestone'])],
-					'labels' => $ticketLabels,
-					'state' => 'closed'
-				));
+				$issueData['state'] = 'closed';
+				$resp = github_update_issue($resp['number'], $issueData);
 				if (isset($resp['number'])) {
 					echo "Closed issue #{$resp['number']}\n";
 				}
@@ -184,7 +178,7 @@ if (!$skip_comments) {
 	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
 	foreach ($res->fetchAll() as $row) {
 		$text = strtolower($row['author']) == strtolower($username) ? $row['newvalue'] : '**Author: ' . $row['author'] . "**\n" . $row['newvalue'];
-		$resp = github_add_comment($tickets[$row['ticket']], translate_markup($text));
+		$resp = github_add_comment($tickets[$row['ticket']], translate_markup(utf8_encode($text)));
 		if (isset($resp['url'])) {
 			// OK
 			echo "Added comment {$resp['url']}\n";
@@ -212,9 +206,9 @@ function github_post($url, $json, $patch = false) {
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
 	}
 	$ret = curl_exec($ch);
-	if(!$ret) { 
-        trigger_error(curl_error($ch)); 
-    } 
+	if(!$ret) {
+        trigger_error(curl_error($ch));
+    }
 	curl_close($ch);
 	return $ret;
 }
@@ -254,8 +248,21 @@ function translate_markup($data) {
     $data = preg_replace('/\{\{\{(\s*#!(\w+))?/m', '```$2', $data);
     $data = preg_replace('/\}\}\}/', '```', $data);
 
+    // Replace title blocks
+    $data = preg_replace("/^=(\s.+\s)=$/", '#$1#', $data);
+    $data = preg_replace("/^==(\s.+\s)==$/", '##$1##', $data);
+    $data = preg_replace("/^===(\s.+\s)===$/", '###$1###', $data);
+    $data = preg_replace("/^====(\s.+\s)====$/", '####$1####', $data);
+
+    // Replace bold and italic
+    $data = preg_replace("/'''(\S.+\S)'''/", '**$1**', $data);
+    $data = preg_replace("/''(\S.+\S)''/", '*$1*', $data);
+
     // Avoid non-ASCII characters, as that will cause trouble with json_encode()
 	$data = preg_replace('/[^(\x00-\x7F)]*/','', $data);
+
+	// There is a strange issue with data containing percent signs...
+	$data = preg_replace("/%/", '[prc]', $data);
 
     // Possibly translate other markup as well?
     return $data;
