@@ -6,6 +6,6 @@ Features:
 - Slows down to match the 60 requests per second API limit rate
 
 Usage:
-1. Edit the configuration variables in the file above the DO NOT EDIT BELOW comment.
+1. Copy config.php.sample to config.php and edit the configuration variables
 2. Run it from shell, e.g.:
 $ php trac2github.php
