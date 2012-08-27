@@ -2,8 +2,8 @@
 
 // Edit configuration below
 
-$username = 'Put your github username here';
-$password = 'Put your github password here';
+$username = $default_username = 'Put your github username here';
+$password = $default_password = 'Put your github password here';
 $project = 'Organization or User name';
 $repo = 'Repository name';
 
@@ -12,6 +12,11 @@ $users_list = array(
 	'TracUsermame' => 'GithubUsername',
 	'Trustmaster' => 'trustmaster',
 	'John.Done' => 'johndoe'
+);
+
+// map of github user => password to create issues and comments as in trac. Leave empty to use github default user specified above from $default_username and $default_password var
+$github_users = array(
+	// 'github username' => 'github password',
 );
 
 $mysqlhost_trac = 'Trac MySQL host';

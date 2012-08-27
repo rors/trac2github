@@ -113,14 +113,13 @@ if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
 	$res = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
+
 	foreach ($res->fetchAll() as $row) {
 		// do not esclude ticket without milestone
 		// if (empty($row['milestone'])) {
 		// 	continue;
 		// }
-		if (empty($row['owner']) || !isset($users_list[$row['owner']])) {
-			$row['owner'] = $username;
-		}
+
 		$ticketLabels = array();
 		if (!empty($labels['T'][crc32($row['type'])])) {
 		    $ticketLabels[] = $labels['T'][crc32($row['type'])];
@@ -135,11 +134,33 @@ if (!$skip_tickets) {
 		    $ticketLabels[] = $labels['R'][crc32($row['resolution'])];
 		}
 
+		// if more trac ticket is assigned at more users get the first one (github api v3 dosen't support multi assignee)
+		if (empty($row['owner'])) {
+			$row['owner'] = $default_username;
+		}
+		$owners = str_replace(' ', ',', $row['owner']);
+		$owners = explode(',', $owners);
+		$owner = $owners[0];
+		if (isset($users_list[$owner])) {
+			$assignee = $users_list[$owner];
+		} else {
+			$assignee = $default_username;
+		}
+
+		// set github username and password to post ticket
+		if (isset($users_list[$row['reporter']]) && $github_users[$users_list[$row['reporter']]]) {
+			$username = $users_list[$row['reporter']];
+			$password = $github_users[$username];
+		} else {
+			$username = $default_username;
+			$password = $default_password;
+		}
+		//print_r($username);print_r($password);print_r($assignee);exit;
         // There is a strange issue with summaries containing percent signs...
         $issueData = array(
 			'title' => utf8_encode(preg_replace("/%/", '[pct]', $row['summary'])),
 			'body' => empty($row['description']) ? 'None' : translate_markup(utf8_encode($row['description'])),
-			'assignee' => isset($users_list[$row['owner']]) ? $users_list[$row['owner']] : $row['owner'],
+			'assignee' => $assignee,
 			'labels' => $ticketLabels
 		);
 		// set milestone only if ticket is assigned to it
@@ -177,7 +198,18 @@ if (!$skip_comments) {
 	$limit = $comments_limit > 0 ? "LIMIT $comments_offset, $comments_limit" : '';
 	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
 	foreach ($res->fetchAll() as $row) {
-		$text = strtolower($row['author']) == strtolower($username) ? $row['newvalue'] : '**Author: ' . $row['author'] . "**\n" . $row['newvalue'];
+		// set github username and password to post comment to ticket
+		if (isset($users_list[$row['author']]) && $github_users[$users_list[$row['author']]]) {
+			$username = $users_list[$row['author']];
+			$password = $github_users[$username];
+		} else {
+			$username = $default_username;
+			$password = $default_password;
+		}
+		$text = $row['newvalue'];
+		if (isset($users_list[$row['author']]) && strtolower($users_list[$row['author']]) != strtolower($username)) {
+			$text = '**Author: ' . $row['author'] . "**\n" . $text;
+		}
 		$resp = github_add_comment($tickets[$row['ticket']], translate_markup(utf8_encode($text)));
 		if (isset($resp['url'])) {
 			// OK
