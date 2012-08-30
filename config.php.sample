@@ -19,6 +19,11 @@ $github_users = array(
 	// 'github username' => 'github password',
 );
 
+// array with svn revision as keys and related git revision as value
+$convert_revision = array();
+// alternative to $convert_revision: php file with $covert_revision array (useful because it can be a very big)
+$convert_revision_file = "/home/bato/tmp/revision-svn2git.php"
+
 $mysqlhost_trac = 'Trac MySQL host';
 $mysqluser_trac = 'Trac MySQL user';
 $mysqlpassword_trac = 'Trac MySQL password';

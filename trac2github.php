@@ -109,6 +109,15 @@ if (file_exists($save_tickets)) {
 	$tickets = unserialize(file_get_contents($save_tickets));
 }
 
+// get convert_revision array to replace svn revision with git revision in ticket and ticket comments
+if (empty($convert_revision) && !empty($convert_revision_file)) {
+	include $convert_revision_file;
+	$convert_revision_regexp = array();
+	foreach ($convert_revision as $svnRev => $gitRev) {
+		$convert_revision_regexp['/\[' . $svnRev . '\]/'] = $gitRev;
+	}
+}
+
 if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
@@ -155,7 +164,12 @@ if (!$skip_tickets) {
 			$username = $default_username;
 			$password = $default_password;
 		}
-		//print_r($username);print_r($password);print_r($assignee);exit;
+
+		// replace svn revision with git revision
+		if (!empty($convert_revision_regexp)) {
+			$row['description'] = preg_replace(array_keys($convert_revision_regexp), $convert_revision_regexp, $row['description']);
+		}
+
         // There is a strange issue with summaries containing percent signs...
         $issueData = array(
 			'title' => utf8_encode(preg_replace("/%/", '[pct]', $row['summary'])),
@@ -198,6 +212,12 @@ if (!$skip_comments) {
 	$limit = $comments_limit > 0 ? "LIMIT $comments_offset, $comments_limit" : '';
 	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
 	foreach ($res->fetchAll() as $row) {
+		$text = $row['newvalue'];
+		// replace svn revision with git revision
+		if (!empty($convert_revision_regexp)) {
+			$text = preg_replace(array_keys($convert_revision_regexp), $convert_revision_regexp, $text);
+		}
+
 		// set github username and password to post comment to ticket
 		if (isset($users_list[$row['author']]) && $github_users[$users_list[$row['author']]]) {
 			$username = $users_list[$row['author']];
@@ -205,11 +225,11 @@ if (!$skip_comments) {
 		} else {
 			$username = $default_username;
 			$password = $default_password;
+			if ( (isset($users_list[$row['author']]) && strtolower($users_list[$row['author']]) != strtolower($username)) || (!isset($users_list[$row['author']]) && $username != $row['author']) ) {
+				$text = '**Author: ' . $row['author'] . "**\n" . $text;
+			}
 		}
-		$text = $row['newvalue'];
-		if (isset($users_list[$row['author']]) && strtolower($users_list[$row['author']]) != strtolower($username)) {
-			$text = '**Author: ' . $row['author'] . "**\n" . $text;
-		}
+
 		$resp = github_add_comment($tickets[$row['ticket']], translate_markup(utf8_encode($text)));
 		if (isset($resp['url'])) {
 			// OK
