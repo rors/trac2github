@@ -233,7 +233,7 @@ if (!$skip_comments) {
 		
 		// Prepend the date, since the Github API doesn't permit date-setting
 		$date = date ('g.ia, l, jS F Y', substr ($row['time'], 0, -6));
-		$text = "**[Added to the original trac issue at {$date}]**\n\n" . $date;
+		$text = "**[Added to the original trac issue at {$date}]**\n\n" . $text;
 		
 		// replace svn revision with git revision
 		if (!empty($convert_revision_regexp)) {
