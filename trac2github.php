@@ -260,6 +260,7 @@ if (!$skip_comments) {
 
 // Close issues that are closed
 if (!$skip_tickets) {
+	$username = $default_username;	// #!# Ideally we need to work out who closed the ticket, instead of this
 	foreach ($resTicketsAll as $row) {
 		if ($row['status'] == 'closed') {
 			$issueData = array ('state' => 'closed');
