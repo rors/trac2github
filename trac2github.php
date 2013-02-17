@@ -175,10 +175,11 @@ if (!$skip_tickets) {
 			$row['description'] = preg_replace(array_keys($convert_revision_regexp), $convert_revision_regexp, $row['description']);
 		}
 
-        // There is a strange issue with summaries containing percent signs...
-        $issueData = array(
+	        // There is a strange issue with summaries containing percent signs...
+		$date = date ('g.ia, l, jS F Y', ($row['time'] * (1/1000000)));
+		$issueData = array(
 			'title' => utf8_encode(preg_replace("/%/", '[pct]', $row['summary'])),
-			'body' => empty($row['description']) ? 'None' : translate_markup(utf8_encode($row['description'])),
+			'body' => empty($row['description']) ? 'None' : "**[Submitted to the original trac issue list at {$date}]**\n\n" . translate_markup(utf8_encode($row['description'])),
 			'assignee' => $assignee,
 			'labels' => $ticketLabels
 		);
