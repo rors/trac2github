@@ -129,6 +129,7 @@ if (!$skip_tickets) {
 	$res = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
 
 	foreach ($res->fetchAll() as $row) {
+if ($row['id'] == 10) {break;}
 		// do not esclude ticket without milestone
 		// if (empty($row['milestone'])) {
 		// 	continue;
@@ -178,7 +179,7 @@ if (!$skip_tickets) {
 	        // There is a strange issue with summaries containing percent signs...
 		$date = date ('g.ia, l, jS F Y', ($row['time'] * (1/1000000)));
 		$issueData = array(
-			'title' => utf8_encode(preg_replace("/%/", '[pct]', $row['summary'])),
+			'title' => utf8_encode($row['summary']),
 			'body' => empty($row['description']) ? 'None' : "**[Submitted to the original trac issue list at {$date}]**\n\n" . translate_markup(utf8_encode($row['description'])),
 			'assignee' => $assignee,
 			'labels' => $ticketLabels
@@ -320,10 +321,7 @@ function translate_markup($data) {
     $data = preg_replace("/''(\S.+\S)''/", '*$1*', $data);
 
     // Avoid non-ASCII characters, as that will cause trouble with json_encode()
-	$data = preg_replace('/[^(\x00-\x7F)]*/','', $data);
-
-	// There is a strange issue with data containing percent signs...
-	$data = preg_replace("/%/", '[prc]', $data);
+    $data = preg_replace('/[^(\x00-\x7F)]*/','', $data);
 
     // Possibly translate other markup as well?
     return $data;
