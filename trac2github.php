@@ -195,7 +195,7 @@ if (!$skip_tickets) {
 		$date = date ('g.ia, l, jS F Y', substr ($row['time'], 0, -6));
 		$issueData = array(
 			'title' => utf8_encode($row['summary']),
-			'body' => empty($row['description']) ? 'None' : "**[Submitted to the original trac issue list at {$date}]**\n\n" . translate_markup(utf8_encode($row['description'])),
+			'body' => empty($row['description']) ? 'None' : "**[Submitted to the original trac issue database at {$date}]**\n\n" . translate_markup(utf8_encode($row['description'])),
 			'assignee' => $assignee,
 			'labels' => $ticketLabels
 		);
@@ -230,6 +230,11 @@ if (!$skip_comments) {
 	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
 	foreach ($res->fetchAll() as $row) {
 		$text = $row['newvalue'];
+		
+		// Prepend the date, since the Github API doesn't permit date-setting
+		$date = date ('g.ia, l, jS F Y', substr ($row['time'], 0, -6));
+		$text = "**[Added to the original trac issue at {$date}]**\n\n" . $date;
+		
 		// replace svn revision with git revision
 		if (!empty($convert_revision_regexp)) {
 			$text = preg_replace(array_keys($convert_revision_regexp), $convert_revision_regexp, $text);
