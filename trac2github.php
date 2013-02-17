@@ -45,7 +45,7 @@ if (!$skip_milestones) {
 			'title' => $row['name'],
 			'state' => $row['completed'] == 0 ? 'open' : 'closed',
 			'description' => empty($row['description']) ? 'None' : $row['description'],
-			'due_on' => date('Y-m-d\TH:i:s\Z', ($row['due'] * (1/1000000)))
+			'due_on' => date('Y-m-d\TH:i:s\Z', substr ($row['due'], 0, -6)),
 		));
 		if (isset($resp['number'])) {
 			// OK
@@ -189,7 +189,7 @@ if (!$skip_tickets) {
 		}
 
 	        // There is a strange issue with summaries containing percent signs...
-		$date = date ('g.ia, l, jS F Y', ($row['time'] * (1/1000000)));
+		$date = date ('g.ia, l, jS F Y', substr ($row['time'], 0, -6));
 		$issueData = array(
 			'title' => utf8_encode($row['summary']),
 			'body' => empty($row['description']) ? 'None' : "**[Submitted to the original trac issue list at {$date}]**\n\n" . translate_markup(utf8_encode($row['description'])),
