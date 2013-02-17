@@ -253,7 +253,7 @@ echo "Done whatever possible, sorry if not.\n";
 function github_post($url, $json, $patch = false) {
 	global $username, $password, $rateLimit;
 	if ($rateLimit) {
-		usleep (1000000 * $rateLimit / (60 * 60));
+		usleep (ceil (1000000 * $rateLimit / (60 * 60)));
 	}
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
