@@ -30,8 +30,6 @@ if ($sqlitePath) {
 
 echo "Connected to Trac\n";
 
-die;
-
 $milestones = array();
 if (file_exists($save_milestones)) {
 	$milestones = unserialize(file_get_contents($save_milestones));
