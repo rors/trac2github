@@ -202,7 +202,6 @@ if (!$skip_tickets) {
 		}
 
 		$resp = github_add_issue($issueData);
-		$responsesCache[$row['id']] = $resp;
 
 		if (isset($resp['number'])) {
 			// OK
@@ -262,10 +261,9 @@ if (!$skip_comments) {
 // Close issues that are closed
 if (!$skip_tickets) {
 	foreach ($resTicketsAll as $row) {
-		$resp = $responsesCache[$row['id']];	// Read the responses cache which enables us to know the Github issue number
 		if ($row['status'] == 'closed') {
 			$issueData['state'] = 'closed';
-			$resp = github_update_issue($resp['number'], $issueData);
+			$resp = github_update_issue($tickets[$row['id']], $issueData);
 			if (isset($resp['number'])) {
 				echo "Closed issue #{$resp['number']}\n";
 			}
