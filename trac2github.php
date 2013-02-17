@@ -129,7 +129,6 @@ if (!$skip_tickets) {
 	$res = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
 
 	foreach ($res->fetchAll() as $row) {
-if ($row['id'] == 10) {break;}
 		// do not esclude ticket without milestone
 		// if (empty($row['milestone'])) {
 		// 	continue;
