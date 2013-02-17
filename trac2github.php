@@ -262,7 +262,7 @@ if (!$skip_comments) {
 if (!$skip_tickets) {
 	foreach ($resTicketsAll as $row) {
 		if ($row['status'] == 'closed') {
-			$issueData['state'] = 'closed';
+			$issueData = array ('state' => 'closed');
 			$resp = github_update_issue($tickets[$row['id']], $issueData);
 			if (isset($resp['number'])) {
 				echo "Closed issue #{$resp['number']}\n";
