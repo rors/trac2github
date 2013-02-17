@@ -88,9 +88,16 @@ if (!$skip_labels) {
 							SELECT DISTINCT 'R' label_type, resolution name, '55ff55' color
 	                        FROM ticket WHERE IFNULL(resolution, '') <> ''");
 
+	// Define label name expansions
+	$labelTypeNames = array (
+		'P' => 'Priority',
+		'R' => 'Resolution',
+		'T' => 'Type',
+	);
+
 	foreach ($res->fetchAll() as $row) {
 		$resp = github_add_label(array(
-			'name' => $row['label_type'] . ': ' . $row['name'],
+			'name' => $labelTypeNames[$row['label_type']] . ': ' . $row['name'],
 			'color' => $row['color']
 		));
 
