@@ -41,12 +41,15 @@ if (!$skip_milestones) {
 	$mnum = 1;
 	foreach ($res->fetchAll() as $row) {
 		//$milestones[$row['name']] = ++$mnum;
-		$resp = github_add_milestone(array(
+		$milestoneData = array(
 			'title' => $row['name'],
 			'state' => $row['completed'] == 0 ? 'open' : 'closed',
 			'description' => empty($row['description']) ? 'None' : $row['description'],
-			'due_on' => date('Y-m-d\TH:i:s\Z', substr ($row['due'], 0, -6)),
-		));
+		);
+		if ($row['due'] != '0') {
+			$milestoneData['due_on'] = date('Y-m-d\TH:i:s\Z', substr ($row['due'], 0, -6));
+		}
+		$resp = github_add_milestone($milestoneData);
 		if (isset($resp['number'])) {
 			// OK
 			$milestones[crc32($row['name'])] = (int) $resp['number'];
