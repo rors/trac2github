@@ -21,9 +21,16 @@ error_reporting(E_ALL ^ E_NOTICE);
 ini_set('display_errors', 1);
 set_time_limit(0);
 
-$trac_db = new PDO('mysql:host='.$mysqlhost_trac.';dbname='.$mysqldb_trac, $mysqluser_trac, $mysqlpassword_trac);
+// Connect to the trac database, either using SQLite or MySQL
+if ($sqlitePath) {
+	$trac_db = new PDO('sqlite:' . $sqlitePath);
+} else {
+	$trac_db = new PDO('mysql:host='.$mysqlhost_trac.';dbname='.$mysqldb_trac, $mysqluser_trac, $mysqlpassword_trac);
+}
 
 echo "Connected to Trac\n";
+
+die;
 
 $milestones = array();
 if (file_exists($save_milestones)) {

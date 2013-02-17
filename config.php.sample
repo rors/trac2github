@@ -28,6 +28,7 @@ $mysqlhost_trac = 'Trac MySQL host';
 $mysqluser_trac = 'Trac MySQL user';
 $mysqlpassword_trac = 'Trac MySQL password';
 $mysqldb_trac = 'Trac MySQL database name';
+$sqlitePath = false;	// If your trac uses SQLite, add the path to the database here instead
 
 // Do not convert milestones at this run
 $skip_milestones = false;
