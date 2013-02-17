@@ -42,7 +42,7 @@ $ticket_offset = 0; // Start at this offset if limit > 0
 $ticket_limit = 0; // Max tickets per run if > 0
 
 // Do not convert comments
-$skip_comments = true;
+$skip_comments = false;
 $comments_offset = 0; // Start at this offset if limit > 0
 $comments_limit = 0; // Max comments per run if > 0
 
