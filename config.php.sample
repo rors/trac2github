@@ -48,6 +48,7 @@ $comments_limit = 0; // Max comments per run if > 0
 
 // Paths to milestone/ticket cache if you run it multiple times with skip/offset
 $save_milestones = '/tmp/trac_milestones.list';
+$save_labels = '/tmp/trac_labels.list';
 $save_tickets = '/tmp/trac_tickets.list';
 
 // Set this to true if you want to see the JSON output sent to GitHub
