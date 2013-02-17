@@ -251,7 +251,10 @@ if (!$skip_comments) {
 echo "Done whatever possible, sorry if not.\n";
 
 function github_post($url, $json, $patch = false) {
-	global $username, $password;
+	global $username, $password, $rateLimit;
+	if ($rateLimit) {
+		usleep (1000000 * $rateLimit / (60 * 60));
+	}
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
 	curl_setopt($ch, CURLOPT_URL, "https://api.github.com$url");

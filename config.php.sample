@@ -53,6 +53,9 @@ $save_tickets = '/tmp/trac_tickets.list';
 // Set this to true if you want to see the JSON output sent to GitHub
 $verbose = false;
 
+// Rate limiting as requests per hour; see http://developer.github.com/v3/#rate-limiting
+$rateLimit = 5000;
+
 // Uncomment to refresh cache
 // @unlink($save_milestones);
 // @unlink($save_labels);
