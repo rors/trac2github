@@ -45,7 +45,7 @@ if (!$skip_milestones) {
 			'title' => $row['name'],
 			'state' => $row['completed'] == 0 ? 'open' : 'closed',
 			'description' => empty($row['description']) ? 'None' : $row['description'],
-			'due_on' => date('Y-m-d\TH:i:s\Z', (int) $row['due'])
+			'due_on' => date('Y-m-d\TH:i:s\Z', ($row['due'] * (1/1000000)))
 		));
 		if (isset($resp['number'])) {
 			// OK
