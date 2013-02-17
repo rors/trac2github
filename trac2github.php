@@ -133,9 +133,11 @@ if (empty($convert_revision) && !empty($convert_revision_file)) {
 if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
-	$res = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
+	$resTickets = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
+	$resTicketsAll = $resTickets->fetchAll();
 
-	foreach ($res->fetchAll() as $row) {
+	$responsesCache = array ();
+	foreach ($resTicketsAll as $row) {
 		// do not esclude ticket without milestone
 		// if (empty($row['milestone'])) {
 		// 	continue;
@@ -196,20 +198,13 @@ if (!$skip_tickets) {
 		}
 
 		$resp = github_add_issue($issueData);
+		$responsesCache[$row['id']] = $resp;
 
 		if (isset($resp['number'])) {
 			// OK
 			$tickets[$row['id']] = (int) $resp['number'];
 			echo "Ticket #{$row['id']} converted to issue #{$resp['number']}\n";
-			if ($row['status'] == 'closed') {
-				// Close the issue
-				$issueData['state'] = 'closed';
-				$resp = github_update_issue($resp['number'], $issueData);
-				if (isset($resp['number'])) {
-					echo "Closed issue #{$resp['number']}\n";
-				}
-			}
-
+//
 		} else {
 			// Error
 			$error = print_r($resp, 1);
@@ -219,6 +214,7 @@ if (!$skip_tickets) {
 	// Serialize to restore in future
 	file_put_contents($save_tickets, serialize($tickets));
 }
+
 
 if (!$skip_comments) {
 	// Export all comments
@@ -254,6 +250,21 @@ if (!$skip_comments) {
 		}
 	}
 }
+
+// Close issues that are closed
+if (!$skip_tickets) {
+	foreach ($resTicketsAll as $row) {
+		$resp = $responsesCache[$row['id']];	// Read the responses cache which enables us to know the Github issue number
+		if ($row['status'] == 'closed') {
+			$issueData['state'] = 'closed';
+			$resp = github_update_issue($resp['number'], $issueData);
+			if (isset($resp['number'])) {
+				echo "Closed issue #{$resp['number']}\n";
+			}
+		}
+	}
+}
+
 
 echo "Done whatever possible, sorry if not.\n";
 
