@@ -55,6 +55,8 @@ if (!$skip_milestones) {
 			// Error
 			$error = print_r($resp, 1);
 			echo "Failed to convert milestone {$row['name']}: $error\n";
+			echo "Terminating conversion; please address the problem and retry\n";
+			die;
 		}
 	}
 	// Serialize to restore in future
@@ -109,6 +111,8 @@ if (!$skip_labels) {
 			// Error
 			$error = print_r($resp, 1);
 			echo "Failed to convert label {$row['name']}: $error\n";
+			echo "Terminating conversion; please address the problem and retry\n";
+			die;
 		}
 	}
 	// Serialize to restore in future
@@ -249,6 +253,8 @@ if (!$skip_comments) {
 			// Error
 			$error = print_r($resp, 1);
 			echo "Failed to add a comment: $error\n";
+			echo "Terminating conversion; please address the problem and retry\n";
+			die;
 		}
 	}
 }
