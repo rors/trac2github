@@ -178,9 +178,9 @@ if (!$skip_tickets) {
 		}
 
 		// set github username and password to post ticket
-		if (isset($users_list[$row['reporter']]) && $github_users[$users_list[$row['reporter']]]) {
+		if (isset($users_list[$row['reporter']]) && $github_users_passwords[$users_list[$row['reporter']]]) {
 			$username = $users_list[$row['reporter']];
-			$password = $github_users[$username];
+			$password = $github_users_passwords[$username];
 		} else {
 			$username = $default_username;
 			$password = $default_password;
@@ -241,9 +241,9 @@ if (!$skip_comments) {
 		}
 
 		// set github username and password to post comment to ticket
-		if (isset($users_list[$row['author']]) && $github_users[$users_list[$row['author']]]) {
+		if (isset($users_list[$row['author']]) && $github_users_passwords[$users_list[$row['author']]]) {
 			$username = $users_list[$row['author']];
-			$password = $github_users[$username];
+			$password = $github_users_passwords[$username];
 		} else {
 			$username = $default_username;
 			$password = $default_password;

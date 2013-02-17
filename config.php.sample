@@ -14,10 +14,12 @@ $users_list = array(
 	'John.Done' => 'johndoe'
 );
 
-// map of github user => password to create issues and comments as in trac. Leave empty to use github default user specified above from $default_username and $default_password var
-$github_users = array(
+// Map of github user => password to create issues and comments as in trac. Leave empty to use github default user specified above from $default_username and $default_password var
+// Using the oauth token method above is more secure and preferable.
+$github_users_passwords = array (
 	// 'github username' => 'github password',
 );
+
 
 // array with svn revision as keys and related git revision as value
 $convert_revision = array();
