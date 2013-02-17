@@ -209,6 +209,8 @@ if (!$skip_tickets) {
 			// Error
 			$error = print_r($resp, 1);
 			echo "Failed to convert a ticket #{$row['id']}: $error\n";
+			echo "Terminating conversion; please address the problem and retry\n";
+			die;
 		}
 	}
 	// Serialize to restore in future
