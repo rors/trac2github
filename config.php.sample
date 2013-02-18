@@ -69,6 +69,9 @@ $verbose = false;
 // Rate limiting as requests per hour; see http://developer.github.com/v3/#rate-limiting
 $rateLimit = 5000;
 
+// Whether to remove e-mail addresses
+$removeEmailAddresses = false;
+
 // Uncomment to refresh cache
 // @unlink($save_milestones);
 // @unlink($save_labels);

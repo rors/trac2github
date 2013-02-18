@@ -354,7 +354,12 @@ function translate_markup($data) {
     $data = preg_replace("/^=(\s.+\s)=$/", '#$1#', $data);
     $data = preg_replace("/^==(\s.+\s)==$/", '##$1##', $data);
     $data = preg_replace("/^===(\s.+\s)===$/", '###$1###', $data);
-    $data = preg_replace("/^====(\s.+\s)====$/", '####$1####', $data);
+
+    // Remove e-mail addresses out of courtesy
+    global $removeEmailAddresses;
+    if ($removeEmailAddresses) {
+        $data = preg_replace('|([_\.0-9a-z-]+@([0-9a-z][0-9a-z-]+\.)+[a-z]{2,6})|', '[e-mail address removed]', $data);
+    }
 
     // Replace bold and italic
     $data = preg_replace("/'''(\S.+\S)'''/", '**$1**', $data);
