@@ -67,6 +67,7 @@ $save_tickets = '/tmp/trac_tickets.list';
 $verbose = false;
 
 // Rate limiting as requests per hour; see http://developer.github.com/v3/#rate-limiting
+// Higher than 5000 is not recommended as this seems to result in entries appearing slightly out of order
 $rateLimit = 5000;
 
 // Whether to remove e-mail addresses

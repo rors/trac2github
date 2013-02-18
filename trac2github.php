@@ -354,6 +354,7 @@ function translate_markup($data) {
     $data = preg_replace("/^=(\s.+\s)=$/", '#$1#', $data);
     $data = preg_replace("/^==(\s.+\s)==$/", '##$1##', $data);
     $data = preg_replace("/^===(\s.+\s)===$/", '###$1###', $data);
+    $data = preg_replace("/^====(\s.+\s)====$/", '####$1####', $data);
 
     // Remove e-mail addresses out of courtesy
     global $removeEmailAddresses;
