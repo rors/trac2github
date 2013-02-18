@@ -2,16 +2,26 @@
 
 // Edit configuration below
 
-$username = $default_username = 'Put your github username here';
-$password = $default_password = 'Put your github password here';
 $project = 'Organization or User name';
 $repo = 'Repository name';
+$username = $default_username = 'Put your github username here';
+$oauth_token = $default_oauth_token = false;	// Get a token from https://help.github.com/articles/creating-an-oauth-token-for-command-line-use
+// or, less securely:
+$password = $default_password = false;
 
 // All users must be valid github logins!
 $users_list = array(
 	'TracUsermame' => 'GithubUsername',
 	'Trustmaster' => 'trustmaster',
-	'John.Done' => 'johndoe'
+	'John.Doe' => 'johndoe'
+);
+
+// Map of github user => OAuth tokens, as created here:
+// https://help.github.com/articles/creating-an-oauth-token-for-command-line-use
+// i.e. ask each user to do this and then give you the token:
+// curl -u 'the-username' -d '{"scopes":["repo"],"note":"Trac conversion"}' https://api.github.com/authorizations
+$github_users_oauth_tokens = array (
+	// 'github username' => 'github oauth token',
 );
 
 // Map of github user => password to create issues and comments as in trac. Leave empty to use github default user specified above from $default_username and $default_password var

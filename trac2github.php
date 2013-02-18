@@ -178,11 +178,13 @@ if (!$skip_tickets) {
 		}
 
 		// set github username and password to post ticket
-		if (isset($users_list[$row['reporter']]) && $github_users_passwords[$users_list[$row['reporter']]]) {
+		if (isset($users_list[$row['reporter']])) {
 			$username = $users_list[$row['reporter']];
-			$password = $github_users_passwords[$username];
+			$oauth_token = (isSet ($github_users_oauth_tokens[$username]) ? $github_users_oauth_tokens[$username] : false);
+			$password = (isSet ($github_users_passwords[$username]) ? $github_users_passwords[$username] : false);
 		} else {
 			$username = $default_username;
+			$oauth_token = $default_oauth_token;
 			$password = $default_password;
 		}
 
@@ -241,11 +243,13 @@ if (!$skip_comments) {
 		}
 
 		// set github username and password to post comment to ticket
-		if (isset($users_list[$row['author']]) && $github_users_passwords[$users_list[$row['author']]]) {
+		if (isset($users_list[$row['author']])) {
 			$username = $users_list[$row['author']];
-			$password = $github_users_passwords[$username];
+			$oauth_token = (isSet ($github_users_oauth_tokens[$username]) ? $github_users_oauth_tokens[$username] : false);
+			$password = (isSet ($github_users_passwords[$username]) ? $github_users_passwords[$username] : false);
 		} else {
 			$username = $default_username;
+			$oauth_token = $default_oauth_token;
 			$password = $default_password;
 			if ( (isset($users_list[$row['author']]) && strtolower($users_list[$row['author']]) != strtolower($username)) || (!isset($users_list[$row['author']]) && $username != $row['author']) ) {
 				$text = '**Author: ' . $row['author'] . "**\n" . $text;
@@ -284,12 +288,16 @@ if (!$skip_tickets) {
 echo "Done whatever possible, sorry if not.\n";
 
 function github_post($url, $json, $patch = false) {
-	global $username, $password, $rateLimit;
+	global $username, $password, $oauth_token, $rateLimit;
 	if ($rateLimit) {
 		usleep (ceil (1000000 * (60 * 60) / $rateLimit));
 	}
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+	if ($oauth_token) {
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array ("Authorization: token {$oauth_token}"));
+	} else {	// Fall back to password auth
+		curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
+	}
 	curl_setopt($ch, CURLOPT_URL, "https://api.github.com$url");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -301,8 +309,8 @@ function github_post($url, $json, $patch = false) {
 	}
 	$ret = curl_exec($ch);
 	if(!$ret) {
-        trigger_error(curl_error($ch));
-    }
+		trigger_error(curl_error($ch));
+	}
 	curl_close($ch);
 	return $ret;
 }
