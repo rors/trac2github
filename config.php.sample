@@ -73,6 +73,12 @@ $rateLimit = 5000;
 // Whether to remove e-mail addresses
 $removeEmailAddresses = false;
 
+// Text replacements within tickets
+$textReplacements = array (
+	// 'search1' => 'replace1',
+	// 'search2' => 'replace2',
+);
+
 // Uncomment to refresh cache
 // @unlink($save_milestones);
 // @unlink($save_labels);
