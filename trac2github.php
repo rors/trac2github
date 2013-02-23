@@ -356,6 +356,12 @@ function translate_markup($data) {
     $data = preg_replace("/^===(\s.+\s)===$/", '###$1###', $data);
     $data = preg_replace("/^====(\s.+\s)====$/", '####$1####', $data);
 
+	// Do string replacement if required
+	global $textReplacements;
+	if ($textReplacements) {
+		$data = strtr ($data, $textReplacements);
+	}
+
     // Remove e-mail addresses out of courtesy
     global $removeEmailAddresses;
     if ($removeEmailAddresses) {
@@ -369,12 +375,6 @@ function translate_markup($data) {
     // Avoid non-ASCII characters, as that will cause trouble with json_encode()
     $data = preg_replace('/[^(\x00-\x7F)]*/','', $data);
 	
-	// Do string replacement if required
-	global $textReplacements;
-	if ($textReplacements) {
-		$data = strtr ($data, $textReplacements);
-	}
-
     // Possibly translate other markup as well?
     return $data;
 }
