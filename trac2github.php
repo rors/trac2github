@@ -298,6 +298,7 @@ function github_post($url, $json, $patch = false) {
 	} else {	// Fall back to password auth
 		curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");
 	}
+	curl_setopt($ch, CURLOPT_USERAGENT, 'trac2github ticket-to-issue conversion script');	// Define user-agent string as required by http://developer.github.com/v3/#user-agent-required
 	curl_setopt($ch, CURLOPT_URL, "https://api.github.com$url");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
