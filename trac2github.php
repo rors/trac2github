@@ -4,9 +4,15 @@
  * @version 1.1
  * @author Vladimir Sibirov
  * @author Lukas Eder
+ * @author Rory Solomon
  * @copyright (c) Vladimir Sibirov 2011
  * @license BSD
  */
+
+// set DB type constants for use in config file
+define('MYSQL','mysql');
+define('SQLITE','sqlite');
+define('POSTGRES','postgres');
 
 if (!file_exists("./config.php")) {
 	echo "ERROR! Missing configuration file config.php. You can copy it from config.php.sample and edit with your data\n";
@@ -17,15 +23,30 @@ require "./config.php";
 
 // DO NOT EDIT BELOW
 
+function set_db_iterator($res) {
+	if ( $database_type == POSTGRES ) {
+		$rows = $res;
+	} else {
+		$rows = $res->fetchAll();
+	}
+	return $rows;
+}
+
 error_reporting(E_ALL ^ E_NOTICE);
 ini_set('display_errors', 1);
 set_time_limit(0);
 
-// Connect to the trac database, either using SQLite or MySQL
-if ($sqlitePath) {
+// Connect to the trac database, either using SQLite, MySQL or Postgres
+if ( $database_type == MYSQL ) {
+	$trac_db = new PDO('mysql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
+}
+ else if ( $database_type == POSTGRES ) {
+	$trac_db = new PDO('pgsql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
+}
+else if ( $database_type == SQLITE ) {
 	$trac_db = new PDO('sqlite:' . $sqlitePath);
 } else {
-	$trac_db = new PDO('mysql:host='.$mysqlhost_trac.';dbname='.$mysqldb_trac, $mysqluser_trac, $mysqlpassword_trac);
+	exit("Invalid value '".$database_type."' specified for variable \$database_type\n");
 }
 
 echo "Connected to Trac\n";
@@ -38,8 +59,9 @@ if (file_exists($save_milestones)) {
 if (!$skip_milestones) {
 	// Export all milestones
 	$res = $trac_db->query("SELECT * FROM `milestone` ORDER BY `due`");
+	$rows = set_db_iterator($res);
 	$mnum = 1;
-	foreach ($res->fetchAll() as $row) {
+	foreach ($rows as $row) {
 		//$milestones[$row['name']] = ++$mnum;
 		$milestoneData = array(
 			'title' => $row['name'],
@@ -99,8 +121,8 @@ if (!$skip_labels) {
 		'R' => 'Resolution',
 		'T' => 'Type',
 	);
-
-	foreach ($res->fetchAll() as $row) {
+	$rows = set_db_iterator($res);
+	foreach ($rows as $row) {
 		$resp = github_add_label(array(
 			'name' => $labelTypeNames[$row['label_type']] . ': ' . $row['name'],
 			'color' => $row['color']
@@ -141,7 +163,7 @@ if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
 	$resTickets = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
-	$resTicketsAll = $resTickets->fetchAll();
+	$resTicketsAll = set_db_iterator($resTickets);
 
 	$responsesCache = array ();
 	foreach ($resTicketsAll as $row) {
@@ -230,7 +252,8 @@ if (!$skip_comments) {
 	// Export all comments
 	$limit = $comments_limit > 0 ? "LIMIT $comments_offset, $comments_limit" : '';
 	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
-	foreach ($res->fetchAll() as $row) {
+	$rows = set_db_iterator($res);
+	foreach ($rows as $row) {
 		$text = $row['newvalue'];
 		
 		// Prepend the date, since the Github API doesn't permit date-setting

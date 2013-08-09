@@ -36,11 +36,18 @@ $convert_revision = array();
 // alternative to $convert_revision: php file with $covert_revision array (useful because it can be a very big)
 $convert_revision_file = "/path/to/file/revision-svn2git.php";
 
-$mysqlhost_trac = 'Trac MySQL host';
-$mysqluser_trac = 'Trac MySQL user';
-$mysqlpassword_trac = 'Trac MySQL password';
-$mysqldb_trac = 'Trac MySQL database name';
-$sqlitePath = false;	// If your trac uses SQLite, add the path to the database here instead
+// specify database type. should be either MYSQL, SQLITE, or POSTGRES
+$database_type = POSTGRES;
+
+$db_host = 'Trac database host';
+$db_port = 'Trac database port';
+$db_name = 'Trac database name';
+$db_user = 'Trac database user';
+$db_password = 'Trac database password';
+
+// For SQLite only, set the path to the database here. For other
+// database types, this field is ignored.
+$db_path = false;
 
 // Do not convert milestones at this run
 $skip_milestones = false;
