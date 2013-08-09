@@ -52,7 +52,7 @@ if (file_exists($save_milestones)) {
 
 if (!$skip_milestones) {
 	// Export all milestones
-	$res = $trac_db->query("SELECT * FROM $Qmilestone$Q ORDER BY $Qdue$Q");
+	$res = $trac_db->query("SELECT * FROM {$Q}milestone{$Q} ORDER BY {$Q}due{$Q}");
 	$rows = set_db_iterator($res);
 	$mnum = 1;
 	foreach ($rows as $row) {
@@ -156,7 +156,7 @@ if (empty($convert_revision) && !empty($convert_revision_file)) {
 if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
-	$resTickets = $trac_db->query("SELECT * FROM $Qticket$Q ORDER BY $Qid$Q $limit");
+	$resTickets = $trac_db->query("SELECT * FROM {$Q}ticket{$Q} ORDER BY {$Q}id{$Q} $limit");
 	$resTicketsAll = set_db_iterator($resTickets);
 
 	$responsesCache = array ();
@@ -245,7 +245,7 @@ if (!$skip_tickets) {
 if (!$skip_comments) {
 	// Export all comments
 	$limit = $comments_limit > 0 ? "LIMIT $comments_offset, $comments_limit" : '';
-	$res = $trac_db->query("SELECT * FROM $Qticket_change$Q where $Qfield$Q = 'comment' AND $Qnewvalue$Q != '' ORDER BY $Qticket$Q, $Qtime$Q $limit");
+	$res = $trac_db->query("SELECT * FROM {$Q}ticket_change{$Q} where {$Q}field{$Q} = 'comment' AND {$Q}newvalue{$Q} != '' ORDER BY {$Q}ticket{$Q}, {$Q}time{$Q} $limit");
 	$rows = set_db_iterator($res);
 	foreach ($rows as $row) {
 		$text = $row['newvalue'];
