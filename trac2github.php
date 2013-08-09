@@ -23,15 +23,6 @@ require "./config.php";
 
 // DO NOT EDIT BELOW
 
-function set_db_iterator($res) {
-	if ( $database_type == POSTGRES ) {
-		$rows = $res;
-	} else {
-		$rows = $res->fetchAll();
-	}
-	return $rows;
-}
-
 error_reporting(E_ALL ^ E_NOTICE);
 ini_set('display_errors', 1);
 set_time_limit(0);
@@ -39,12 +30,15 @@ set_time_limit(0);
 // Connect to the trac database, either using SQLite, MySQL or Postgres
 if ( $database_type == MYSQL ) {
 	$trac_db = new PDO('mysql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
+	$Q = '`';
 }
  else if ( $database_type == POSTGRES ) {
 	$trac_db = new PDO('pgsql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
+	$Q = '"';
 }
 else if ( $database_type == SQLITE ) {
 	$trac_db = new PDO('sqlite:' . $sqlitePath);
+	$Q = '`';
 } else {
 	exit("Invalid value '".$database_type."' specified for variable \$database_type\n");
 }
@@ -58,7 +52,7 @@ if (file_exists($save_milestones)) {
 
 if (!$skip_milestones) {
 	// Export all milestones
-	$res = $trac_db->query("SELECT * FROM `milestone` ORDER BY `due`");
+	$res = $trac_db->query("SELECT * FROM $Qmilestone$Q ORDER BY $Qdue$Q");
 	$rows = set_db_iterator($res);
 	$mnum = 1;
 	foreach ($rows as $row) {
@@ -162,7 +156,7 @@ if (empty($convert_revision) && !empty($convert_revision_file)) {
 if (!$skip_tickets) {
 	// Export tickets
 	$limit = $ticket_limit > 0 ? "LIMIT $ticket_offset, $ticket_limit" : '';
-	$resTickets = $trac_db->query("SELECT * FROM `ticket` ORDER BY `id` $limit");
+	$resTickets = $trac_db->query("SELECT * FROM $Qticket$Q ORDER BY $Qid$Q $limit");
 	$resTicketsAll = set_db_iterator($resTickets);
 
 	$responsesCache = array ();
@@ -251,7 +245,7 @@ if (!$skip_tickets) {
 if (!$skip_comments) {
 	// Export all comments
 	$limit = $comments_limit > 0 ? "LIMIT $comments_offset, $comments_limit" : '';
-	$res = $trac_db->query("SELECT * FROM `ticket_change` where `field` = 'comment' AND `newvalue` != '' ORDER BY `ticket`, `time` $limit");
+	$res = $trac_db->query("SELECT * FROM $Qticket_change$Q where $Qfield$Q = 'comment' AND $Qnewvalue$Q != '' ORDER BY $Qticket$Q, $Qtime$Q $limit");
 	$rows = set_db_iterator($res);
 	foreach ($rows as $row) {
 		$text = $row['newvalue'];
@@ -309,6 +303,17 @@ if (!$skip_tickets) {
 
 
 echo "Done whatever possible, sorry if not.\n";
+
+function set_db_iterator($res) {
+        global $database_type;
+
+	if ( $database_type == POSTGRES ) {
+		$rows = $res;
+	} else {
+		$rows = $res->fetchAll();
+	}
+	return $rows;
+}
 
 function github_post($url, $json, $patch = false) {
 	global $username, $password, $oauth_token, $rateLimit;
