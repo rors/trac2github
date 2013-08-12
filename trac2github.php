@@ -31,14 +31,20 @@ set_time_limit(0);
 if ( $database_type == MYSQL ) {
 	$trac_db = new PDO('mysql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
 	$Q = '`';
+	$as = '';
+	$ifnull = 'IFNULL';
 }
  else if ( $database_type == POSTGRES ) {
 	$trac_db = new PDO('pgsql:host='.$db_host.';port='.$db_port.';dbname='.$db_name.';user='.$db_user.';password='.$db_password.';');
 	$Q = '"';
+	$as = ' as ';
+	$ifnull = 'COALESCE';
 }
 else if ( $database_type == SQLITE ) {
 	$trac_db = new PDO('sqlite:' . $sqlitePath);
 	$Q = '`';
+	$as = '';
+	$ifnull = 'IFNULL';
 } else {
 	exit("Invalid value '".$database_type."' specified for variable \$database_type\n");
 }
@@ -93,21 +99,21 @@ if (file_exists($save_labels)) {
 
 if (!$skip_labels) {
     // Export all "labels"
-	$res = $trac_db->query("SELECT DISTINCT 'T' label_type, type       name, 'cccccc' color
-	                        FROM ticket WHERE IFNULL(type, '')       <> ''
+	$res = $trac_db->query("SELECT DISTINCT 'T' $as label_type, type $as name, 'cccccc' $as color
+	                          FROM ticket WHERE $ifnull(type, '') <> ''
 							UNION
-							SELECT DISTINCT 'C' label_type, component  name, '0000aa' color
-	                        FROM ticket WHERE IFNULL(component, '')  <> ''
+				SELECT DISTINCT 'C' $as label_type, component $as name, '0000aa' $as color
+	                          FROM ticket WHERE $ifnull(component, '') <> ''
 							UNION
-							SELECT DISTINCT 'P' label_type, priority   name, case when lower(priority) = 'urgent' then 'ff0000'
-							                                                      when lower(priority) = 'high'   then 'ff6666'
-																				  when lower(priority) = 'medium' then 'ffaaaa'
-																				  when lower(priority) = 'low'    then 'ffdddd'
-																				  else                                 'aa8888' end color
-	                        FROM ticket WHERE IFNULL(priority, '')   <> ''
+				SELECT DISTINCT 'P' $as label_type, priority $as name, case when lower(priority) = 'urgent' then 'ff0000'
+							                                    when lower(priority) = 'high'   then 'ff6666'
+							                                    when lower(priority) = 'medium' then 'ffaaaa'
+							                                    when lower(priority) = 'low'    then 'ffdddd'
+							                                    else 'aa8888' end $as color
+				  FROM ticket WHERE $ifnull(priority, '')   <> ''
 							UNION
-							SELECT DISTINCT 'R' label_type, resolution name, '55ff55' color
-	                        FROM ticket WHERE IFNULL(resolution, '') <> ''");
+				SELECT DISTINCT 'R' $as label_type, resolution $as name, '55ff55' $as color
+	                          FROM ticket WHERE $ifnull(resolution, '') <> ''");
 
 	// Define label name expansions
 	$labelTypeNames = array (
