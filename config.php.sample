@@ -55,6 +55,14 @@ $skip_milestones = false;
 // Do not convert labels at this run
 $skip_labels = false;
 
+// Change this if you want to customize your label colors:
+$label_color = array (
+	     'type' => 'cccccc',
+	     'component' => '0000aa',
+	     'priority' => 'aa8888',
+	     'resolution' => '55ff55',
+);
+
 // Do not convert tickets
 $skip_tickets = false;
 $ticket_offset = 0; // Start at this offset if limit > 0
