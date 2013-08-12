@@ -99,16 +99,16 @@ if (file_exists($save_labels)) {
 
 if (!$skip_labels) {
     // Export all "labels"
-	$res = $trac_db->query("SELECT DISTINCT 'T' $as label_type, type $as name, $label_color['type'] $as color
+	$res = $trac_db->query("SELECT DISTINCT 'T' $as label_type, type $as name, ".$label_color['type']." $as color
 	                          FROM ticket WHERE $ifnull(type, '') <> ''
 							UNION
-				SELECT DISTINCT 'C' $as label_type, component $as name, $label_color['component'] $as color
+				SELECT DISTINCT 'C' $as label_type, component $as name, ".$label_color['component']." $as color
 	                          FROM ticket WHERE $ifnull(component, '') <> ''
 							UNION
-				SELECT DISTINCT 'P' $as label_type, priority $as name, $label_color['priority'] $as color
+				SELECT DISTINCT 'P' $as label_type, priority $as name, ".$label_color['priority']." $as color
 				  FROM ticket WHERE $ifnull(priority, '')   <> ''
 							UNION
-				SELECT DISTINCT 'R' $as label_type, resolution $as name, $label_color['resolution'] $as color
+				SELECT DISTINCT 'R' $as label_type, resolution $as name, ".$label_color['resolution']." $as color
 	                          FROM ticket WHERE $ifnull(resolution, '') <> ''");
 
 /* case when lower(priority) = 'urgent' then 'ff0000' */
